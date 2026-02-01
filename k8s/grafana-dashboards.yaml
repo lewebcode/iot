@@ -1,0 +1,259 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards
+  labels:
+    app: grafana
+data:
+  dashboard.yaml: |
+    apiVersion: 1
+    providers:
+    - name: 'default'
+      orgId: 1
+      folder: ''
+      type: file
+      disableDeletion: false
+      editable: true
+      options:
+        path: /etc/grafana/provisioning/dashboards
+        foldersFromFilesStructure: true
+  rps-dashboard.json: |
+    {
+      "id": null,
+      "uid": "rps-dashboard",
+      "title": "RPS Dashboard",
+      "tags": ["highload", "rps"],
+      "timezone": "browser",
+      "schemaVersion": 16,
+      "version": 0,
+      "refresh": "10s",
+      "time": {
+        "from": "now-1h",
+        "to": "now"
+      },
+      "timepicker": {},
+      "templating": {
+        "list": []
+      },
+      "annotations": {
+        "list": []
+      },
+      "panels": [
+        {
+          "id": 1,
+          "title": "Current RPS",
+          "type": "timeseries",
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+          "targets": [
+            {
+              "expr": "highload_current_rps",
+              "legendFormat": "RPS",
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus"
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short"
+            }
+          }
+        },
+        {
+          "id": 2,
+          "title": "Total Requests Rate",
+          "type": "timeseries",
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+          "targets": [
+            {
+              "expr": "rate(highload_requests_total[5m])",
+              "legendFormat": "{{endpoint}}",
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus"
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "reqps"
+            }
+          }
+        }
+      ]
+    }
+  latency-dashboard.json: |
+    {
+      "id": null,
+      "uid": "latency-dashboard",
+      "title": "Latency Dashboard",
+      "tags": ["highload", "latency"],
+      "timezone": "browser",
+      "schemaVersion": 16,
+      "version": 0,
+      "refresh": "10s",
+      "time": {
+        "from": "now-1h",
+        "to": "now"
+      },
+      "timepicker": {},
+      "templating": {
+        "list": []
+      },
+      "annotations": {
+        "list": []
+      },
+      "panels": [
+        {
+          "id": 1,
+          "title": "Request Duration (95th percentile)",
+          "type": "timeseries",
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.95, rate(highload_request_duration_seconds_bucket[5m]))",
+              "legendFormat": "{{endpoint}}",
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus"
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s"
+            }
+          }
+        },
+        {
+          "id": 2,
+          "title": "Request Duration (50th percentile)",
+          "type": "timeseries",
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.50, rate(highload_request_duration_seconds_bucket[5m]))",
+              "legendFormat": "{{endpoint}}",
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus"
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s"
+            }
+          }
+        },
+        {
+          "id": 3,
+          "title": "Average Request Duration",
+          "type": "timeseries",
+          "gridPos": {"h": 8, "w": 24, "x": 0, "y": 8},
+          "targets": [
+            {
+              "expr": "rate(highload_request_duration_seconds_sum[5m]) / rate(highload_request_duration_seconds_count[5m])",
+              "legendFormat": "{{endpoint}}",
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus"
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s"
+            }
+          }
+        }
+      ]
+    }
+  anomalies-dashboard.json: |
+    {
+      "id": null,
+      "uid": "anomalies-dashboard",
+      "title": "Anomalies Dashboard",
+      "tags": ["highload", "anomalies"],
+      "timezone": "browser",
+      "schemaVersion": 16,
+      "version": 0,
+      "refresh": "10s",
+      "time": {
+        "from": "now-1h",
+        "to": "now"
+      },
+      "timepicker": {},
+      "templating": {
+        "list": []
+      },
+      "annotations": {
+        "list": []
+      },
+      "panels": [
+        {
+          "id": 1,
+          "title": "Anomalies Detected Rate",
+          "type": "timeseries",
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+          "targets": [
+            {
+              "expr": "rate(highload_anomalies_detected_total[5m])",
+              "legendFormat": "Anomalies/sec",
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus"
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short"
+            }
+          }
+        },
+        {
+          "id": 2,
+          "title": "Total Anomalies",
+          "type": "timeseries",
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+          "targets": [
+            {
+              "expr": "highload_anomalies_detected_total",
+              "legendFormat": "Total Anomalies",
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus"
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short"
+            }
+          }
+        },
+        {
+          "id": 3,
+          "title": "Metrics Processed Rate",
+          "type": "timeseries",
+          "gridPos": {"h": 8, "w": 24, "x": 0, "y": 8},
+          "targets": [
+            {
+              "expr": "rate(highload_metrics_processed_total[5m])",
+              "legendFormat": "Metrics/sec",
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus"
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short"
+            }
+          }
+        }
+      ]
+    }

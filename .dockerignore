@@ -1,0 +1,10 @@
+.git
+.gitignore
+README.md
+*.md
+Dockerfile
+docker-compose.yml
+k8s/
+tests/
+*.test
+
